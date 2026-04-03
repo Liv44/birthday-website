@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.vite
+coverage
 *.local
 
 # Env (clés Supabase — ne pas versionner)
@@ -27,3 +29,6 @@ dist-ssr
 
 # TypeScript
 *.tsbuildinfo
+
+# Outils / cache
+.eslintcache

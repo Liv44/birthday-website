@@ -6,8 +6,10 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <div className="dark min-h-dvh">
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </div>
   </StrictMode>,
 );
