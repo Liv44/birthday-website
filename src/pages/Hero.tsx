@@ -101,13 +101,14 @@ export default function Hero({ celebrantName }: HeroProps) {
         </div>
       </div>
 
-      <div className="card-glass relative z-10 mx-auto mt-6 max-w-2xl rounded-2xl p-6">
+      {/* <div className="card-glass relative z-10 mx-auto mt-6 max-w-2xl rounded-2xl p-6">
         <h2 className="font-display text-lg font-bold text-gray-800">Mot de la fêtarde</h2>
         <p className="mt-2 text-sm leading-relaxed text-gray-600">
           Merci d&apos;être dans ma vie — j&apos;ai hâte de danser, rire et trinquer avec vous. Tenue
           : couleurs vives, bonne humeur obligatoire.
         </p>
-      </div>
+      </div> */}
+      <p className="text-center size-3xl font-bold">tu pues du cul</p>
 
       <div className="relative z-10 mx-auto mt-8 flex flex-col items-center gap-3">
         <p className="text-xs font-medium uppercase tracking-wider text-gray-500">Infos pratiques</p>

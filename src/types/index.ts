@@ -28,3 +28,10 @@ export interface PlanningItem {
   icon: string
   label: string
 }
+
+export interface Photo {
+  id: string
+  storage_path: string
+  author_name: string
+  created_at: string
+}

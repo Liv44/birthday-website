@@ -10,4 +10,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: ["vicontiel-increasingly-inell.ngrok-free.dev"]
+  }
+
 });
