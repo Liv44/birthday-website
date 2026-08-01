@@ -5,11 +5,19 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Norman Regular";
+  src:
+    local("Norman Regular"),
+    url("norman-regular.woff2") format("woff2");
+}
+
 @theme inline {
     --font-heading: var(--font-display);
     --font-sans: var(--font-body);
-    --font-display: "Playfair Display", ui-serif, Georgia, serif;
-    --font-body: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    /*--font-display: "Playfair Display", ui-serif, Georgia, serif;*/
+    --font-display: "Norman Regular", ui-serif, Georgia, serif;
+    --font-body: "Norman Regular", ui-sans-serif, system-ui, sans-serif;
     --color-brand-red: #fa2a00;
     --color-brand-magenta: #fa009d;
     --color-brand-orange: #fa8100;
@@ -140,7 +148,15 @@
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-background text-foreground font-body;
+    @apply text-foreground font-body;
+    @apply overflow-hidden;
+
+    background-color:hsla(8,0%,100%,1);
+    background-image:
+    radial-gradient(at 0% 0%, hsla(359,100%,91%,1) 0px, transparent 50%),
+    radial-gradient(at 85% 88%, hsla(28,100%,91%,1) 0px, transparent 50%),
+    radial-gradient(at 78% 0%, hsla(314,100%,91%,1) 0px, transparent 50%),
+    radial-gradient(at 6% 87%, hsla(38,100%,91%,1) 0px, transparent 50%);
     }
   html {
     @apply font-body;
@@ -153,7 +169,7 @@
     transform: translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateY(-12px) rotate(8deg);
+    transform: translateY(-12px) rotate(0deg);
   }
 }
 

@@ -1,18 +1,19 @@
 import { NavLink } from "react-router-dom"
 
-import { NAV_SECTIONS } from "@/constants/party"
+import { NAV_SECTIONS, NAV_SECTIONS_HEIGHT } from "@/constants/party"
 import { cn } from "@/lib/utils"
 
 export default function Nav() {
   return (
     <nav
-      className="sticky top-0 z-50 border-b backdrop-blur-md"
+      className="sticky top-0 z-50 backdrop-blur-md flex justify-between items-center text-5xl"
       style={{
-        backgroundColor: "rgba(255,255,255,0.85)",
-        borderColor: "rgba(250, 0, 157, 0.15)",
+         height: NAV_SECTIONS_HEIGHT
       }}
     >
-      <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-2 px-4 py-3">
+      {/*<h1 className="py-3 px-4 gradient-text">Les 25+1 ans d’Olivia</h1>*/}
+      <img src="/logo/logo-medium.png" className="size-16 m-2"/>
+      <div className="flex max-w-3xl flex-wrap items-center justify-center gap-2 px-4 py-3">
         {NAV_SECTIONS.map((s) => (
           <NavLink
             key={s.id}
@@ -20,10 +21,10 @@ export default function Nav() {
             end={s.path === "/"}
             className={({ isActive }) =>
               cn(
-                "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
+                "rounded-full px-3 py-1.5 font-medium transition-colors",
                 isActive
-                  ? "border-[#FA009D] bg-gradient-to-br from-[rgba(250,0,157,0.12)] to-[rgba(250,129,0,0.12)] text-[#FA009D]"
-                  : "border-[#FFDCCD] bg-white text-gray-400 hover:border-[#FA009D]",
+                  ? "text-[#FA009D]"
+                  : "text-black hover:text-[#FF8FDD]",
               )
             }
           >
