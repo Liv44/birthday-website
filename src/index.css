@@ -1,23 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@400;500;600&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
-@font-face {
-  font-family: "Norman Regular";
-  src:
-    local("Norman Regular"),
-    url("norman-regular.woff2") format("woff2");
-}
-
 @theme inline {
     --font-heading: var(--font-display);
     --font-sans: var(--font-body);
     /*--font-display: "Playfair Display", ui-serif, Georgia, serif;*/
-    --font-display: "Norman Regular", ui-serif, Georgia, serif;
-    --font-body: "Norman Regular", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Bagel Fat One", ui-serif, Georgia, serif;
+    --font-body: "Montserrat", ui-sans-serif, system-ui, sans-serif;
     --color-brand-red: #fa2a00;
     --color-brand-magenta: #fa009d;
     --color-brand-orange: #fa8100;

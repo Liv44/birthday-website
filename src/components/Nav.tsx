@@ -46,7 +46,7 @@ export default function Nav() {
   return (
     <>
       <nav
-        className="sticky top-0 z-[51] flex items-center justify-between text-5xl backdrop-blur-md"
+        className="sticky top-0 z-[51] flex items-center justify-between text-3xl backdrop-blur-md"
         style={{
           height: NAV_SECTIONS_HEIGHT,
         }}

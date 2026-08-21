@@ -22,7 +22,7 @@ export default function Hero() {
         <Star className="absolute float-delay left-0 bottom-35 size-7" />
         <Star className="absolute float left-25 top-55 size-6"/>
         <Star className="absolute float-delay right-0 bottom-35 size-9"/>
-        <h1 className="p-2 gradient-text font-display text-4xl tracking-tight sm:text-8xl">
+        <h1 className="p-2 gradient-text font-display text-4xl tracking-tight sm:text-7xl">
           Les 25+1 ans d’Olivia
         </h1>
       </div>
