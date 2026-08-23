@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button"
 import { isSupabaseConfigured, SUPABASE_CONFIG_HELP } from "@/lib/supabase"
 import { listGalleryPhotos, type GalleryPhoto } from "@/lib/supabase/storage"
 import { cn } from "@/lib/utils"
+import JSZip from "jszip"
+import { DownloadIcon } from "lucide-react"
+
+const EXTENSION_FILE_REGEX = /\.[0-9a-z]+$/i
 
 export default function Gallery() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
@@ -68,33 +72,42 @@ export default function Gallery() {
   }, [selectedIndex, photos.length])
 
   const selectedPhoto = selectedIndex !== null ? photos[selectedIndex] : null
+  const selectedPhotoDate = selectedPhoto?.last_modified ? new Date(selectedPhoto?.last_modified).toLocaleDateString("fr-FR", {hour:"2-digit", minute:"2-digit"}) : null
 
   const handleDownloadGallery = async () => {
     // download the gallery as a zip file
-    // const zip = new JSZi()
-    // photos.forEach(photo => {
-    //   zip.file(photo.path, photo.url)
-    // })
-    // const content = await zip.generateAsync({ type: "blob" })
-    // const url = URL.createObjectURL(content)
-    // const link = document.createElement("a")
-    // link.href = url
-    // link.download = "gallery.zip"
-    // link.click()
-  } 
+    const zip = new JSZip()
+
+    for (const photo of photos) {
+      const response = await fetch(photo.url);
+      const blob = await response.blob();
+
+      const fileExtension = photo.storage_path.match(EXTENSION_FILE_REGEX)?.[0]
+      const fileName = photo.name ?? `${new Date(photo.created_at).toISOString()}${fileExtension}`
+
+      zip.file(fileName, blob)
+    }
+
+    const content = await zip.generateAsync({ type: "blob" })
+    const url = URL.createObjectURL(content)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "gallery.zip"
+    link.click()
+  }
 
   async function downloadPhoto(url: string, filename: string) {
     const response = await fetch(url);
     const blob = await response.blob();
     const blobUrl = URL.createObjectURL(blob);
-  
+
     const link = document.createElement('a');
     link.href = blobUrl;
     link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
-  
+
     URL.revokeObjectURL(blobUrl);
   }
 
@@ -156,7 +169,7 @@ export default function Gallery() {
 
       {selectedPhoto && selectedIndex !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-999 flex items-center justify-center bg-black/80 p-4"
           onClick={() => setSelectedIndex(null)}
           role="dialog"
           aria-modal="true"
@@ -205,10 +218,18 @@ export default function Gallery() {
               alt={`Photo de ${selectedPhoto.author_name}`}
               className={cn("max-h-[75vh] max-w-full rounded-lg object-contain")}
             />
-            <div className="rounded-lg bg-black/50 px-4 py-2 text-center text-white">
-              <p className="font-medium">{selectedPhoto.author_name}</p>
-              {selectedPhoto.last_modified && <p className="text-xs text-white">{new Date(selectedPhoto.last_modified).getHours() + 'h' + new Date(selectedPhoto.last_modified).getMinutes()}</p>}
-              <button className="text-xs bg-white text-black px-2 py-1 rounded-md" onClick={()=> downloadPhoto(selectedPhoto.url, selectedPhoto.author_name + ".jpg")}>Télécharger</button>
+            <div className="rounded-lg bg-black/50 px-4 py-2 text-center text-white flex flex-row w-full max-w-64 justify-between">
+              <div className="flex flex-col justify-start items-start">
+                <p className="font-medium truncate max-w-42 overflow-hidden text-nowrap">{selectedPhoto.author_name}</p>
+                {selectedPhoto.last_modified && (
+
+                  <p className="text-xs text-white">{selectedPhotoDate}</p>
+                )}
+              </div>
+              <Button onClick={()=> downloadPhoto(selectedPhoto.url, selectedPhoto.author_name + ".jpg")} variant={"secondary"} size={"icon-lg"}>
+                <span className="sr-only">Télécharger</span>
+                <DownloadIcon/>
+              </Button>
             </div>
           </div>
         </div>
