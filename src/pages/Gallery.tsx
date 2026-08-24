@@ -6,7 +6,7 @@ import { isSupabaseConfigured, SUPABASE_CONFIG_HELP } from "@/lib/supabase"
 import { listGalleryPhotos, type GalleryPhoto } from "@/lib/supabase/storage"
 import { cn } from "@/lib/utils"
 import JSZip from "jszip"
-import { DownloadIcon } from "lucide-react"
+import { DownloadIcon, UploadIcon } from "lucide-react"
 
 const EXTENSION_FILE_REGEX = /\.[0-9a-z]+$/i
 
@@ -114,16 +114,20 @@ export default function Gallery() {
   return (
     <div className="flex flex-col items-center gap-6 px-4 py-8">
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-semibold">Galerie photos</h1>
+        <h1 className="font-display text-3xl font-semibold">Galerie photos</h1>
         <p className="max-w-md text-muted-foreground">
           Les souvenirs partagés par les invités.
         </p>
-        <Button render={<Link to="/add-photos" />} variant="outline" size="sm">
-          Ajouter des photos
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleDownloadGallery}>
+        <div className="flex md:flex-row flex-col gap-2">
+          <Button render={<Link to="/add-photos" />} variant="default" size="lg">
+            <UploadIcon data-icon="inline-start" />
+            Ajouter des photos
+          </Button>
+          <Button variant="default" size="lg" onClick={handleDownloadGallery}>
+            <DownloadIcon data-icon="inline-start" />
             Télécharger la galerie
-        </Button>
+          </Button>
+        </div>
       </div>
 
       {loading && (
@@ -212,7 +216,7 @@ export default function Gallery() {
             </button>
           )}
 
-          <div className="flex max-h-[85vh] max-w-full flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
+          <div className="flex max-h-[85vh] max-w-full px-12 md:px-0 flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
             <img
               src={selectedPhoto.url}
               alt={`Photo de ${selectedPhoto.author_name}`}
