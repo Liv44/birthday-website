@@ -12,7 +12,7 @@ export default function PartyLayout() {
       // }}
     >
       <Nav />
-      <main className="mx-auto w-full px-4 py-8" style={{height: `calc(100vh - ${NAV_SECTIONS_HEIGHT}`}}>
+      <main className="mx-auto w-full px-4 py-8" style={{minHeight: `calc(100vh - ${NAV_SECTIONS_HEIGHT}`}}>
         <Outlet />
       </main>
       <footer className="font-body py-8 text-center text-lg text-black">

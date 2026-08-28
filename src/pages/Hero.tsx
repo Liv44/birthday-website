@@ -9,7 +9,7 @@ import Star from "@/components/assets/stars/Star";
 
 export default function Hero() {
   return (
-    <div className="relative flex flex-col w-full h-full justify-center items-center">
+    <div className="relative flex flex-col w-full min-h-screen justify-center items-center space-y-32">
       <FlowerFrontOrangeGradient className="absolute top-15 -left-25 size-34" />
       <DiscoBallPinkGradient className="hidden lg:block absolute -left-45"/>
       <DiscoBallYellowGradient className="absolute -top-55 z-51" />

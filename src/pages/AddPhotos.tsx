@@ -1,36 +1,52 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { Link } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { isSupabaseConfigured, SUPABASE_CONFIG_HELP } from "@/lib/supabase"
 import { uploadPhoto } from "@/lib/supabase/storage"
+import { FileDropzone } from "@/components/ui/file-upload/dropzone"
+import { FileList } from "@/components/ui/file-upload/file-list"
+import { SendIcon } from "lucide-react"
+
+const UPLOAD_CONCURRENCY = 3
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  concurrency: number,
+  fn: (item: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length)
+  let nextIndex = 0
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const index = nextIndex
+      nextIndex += 1
+      results[index] = await fn(items[index], index)
+    }
+  }
+
+  const workerCount = Math.min(concurrency, items.length)
+  await Promise.all(Array.from({ length: workerCount }, () => worker()))
+  return results
+}
 
 export default function AddPhotos() {
+  const cameraInputRef = useRef<HTMLInputElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const [authorName, setAuthorName] = useState("")
-  const [photos, setPhotos] = useState<any[]>([])
+  const [photos, setPhotos] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState({ done: 0, total: 0 })
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-    useEffect(()=> {
-        console.log(photos)
-    }, [photos])
-
-  function handleAddPhotos(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = e.target.files
+  function handleAddPhotos(files: FileList | null) {
     if (files) {
-      const filesArray = Array.from(files);
-      console.log(filesArray)
-      setPhotos((old) => [...old, ...filesArray])
+      setPhotos((old) => [...old, ...Array.from(files)])
       setSuccess(false)
     }
-    e.target.value = ""
-  }
-
-  function deletePhoto(index: number) {
-    setPhotos((current) => current.filter((_, i) => i !== index))
   }
 
   async function handleUpload(e: FormEvent) {
@@ -51,31 +67,55 @@ export default function AddPhotos() {
     setLoading(true)
     setError(null)
     setSuccess(false)
+    setProgress({ done: 0, total: photos.length })
 
-    const lastModifiedDate = (photo: File)=> {
-        return photo.lastModified ? new Date(photo.lastModified).toISOString() : undefined
+    const lastModifiedDate = (photo: File) => {
+      return photo.lastModified ? new Date(photo.lastModified).toISOString() : undefined
     }
-    
-    const results = await Promise.all(photos.map((photo) => uploadPhoto(photo, {
+
+    const results = await mapWithConcurrency(photos, UPLOAD_CONCURRENCY, async (photo) => {
+      const result = await uploadPhoto(photo, {
         authorName: authorName.trim(),
         name: photo.name,
-        lastModified: lastModifiedDate(photo)
-    })))
-    const failed = results.find((result) => result.error)
+        lastModified: lastModifiedDate(photo),
+      })
+      setProgress((current) => ({ ...current, done: current.done + 1 }))
+      return result
+    })
+
+    const remaining = photos.filter((_, index) => results[index].error)
+    const failedCount = remaining.length
 
     setLoading(false)
-    if (failed?.error) {
-      setError(failed.error.message)
+    setPhotos(remaining)
+    if (failedCount > 0) {
+      setError(
+        failedCount === results.length
+          ? "L’envoi a échoué. Réessaie avec une connexion plus stable."
+          : `${failedCount} photo${failedCount > 1 ? "s" : ""} n’ont pas pu être envoyées. Réessaie les fichiers restants.`,
+      )
       return
     }
 
-    setPhotos([])
     setSuccess(true)
   }
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    handleAddPhotos(e.dataTransfer.files)
+  }
+
+  const removeFile = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div className="flex flex-col items-center gap-4 px-4 py-8">
-      <h1 className="text-2xl font-semibold">Partager des photos</h1>
+      <h1 className="font-display text-3xl font-semibold">Partager des photos</h1>
       <p className="max-w-md text-center text-muted-foreground">
         Ajoute tes photos de la soirée — elles apparaîtront dans la galerie avec ton nom.
       </p>
@@ -95,20 +135,29 @@ export default function AddPhotos() {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <input
-            ref={inputRef}
-            type="file"
-            multiple
-            accept="image/*"
-            className="hidden"
-            onChange={handleAddPhotos}
-          />
-          <Button type="button" onClick={() => inputRef.current?.click()} disabled={loading}>
-            Ajouter des photos
-          </Button>
-          <Button type="submit" variant="secondary" disabled={loading || photos.length === 0}>
-            {loading ? "Envoi en cours…" : "Envoyer"}
+        <div className="flex flex-col items-center justify-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <FileDropzone
+              cameraInputRef={cameraInputRef}
+              handleCameraClick={() => cameraInputRef.current?.click()}
+              fileInputRef={inputRef}
+              handleBoxClick={() => inputRef.current?.click()}
+              handleDragOver={handleDragOver}
+              handleDrop={handleDrop}
+              handleFileSelect={handleAddPhotos}
+            />
+            <div className="max-h-96 overflow-y-auto">
+              <FileList
+                removeFile={removeFile}
+                uploadedFiles={photos}
+              />
+            </div>
+          </div>
+          <Button type="submit" variant="default" disabled={loading || photos.length === 0}>
+            <SendIcon data-icon="inline-start" />
+            {loading
+              ? `Envoi ${progress.done}/${progress.total}…`
+              : "Envoyer"}
           </Button>
         </div>
       </form>
@@ -123,31 +172,9 @@ export default function AddPhotos() {
           <p className="max-w-md text-sm text-green-600" role="status">
             Photos envoyées avec succès, merci !
           </p>
-          <Button render={<Link to="/gallery" />} variant="outline" size="sm">
+          <Button render={<Link to="/gallery" />} variant="default" size="lg">
             Voir la galerie
           </Button>
-        </div>
-      )}
-
-      {photos.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2">
-          {photos.map((photo, index) => (
-            <div key={`${photo.name}-${index}`} className="relative">
-              <img
-                src={URL.createObjectURL(photo)}
-                alt={photo.name}
-                className="h-20 w-20 rounded-md object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => deletePhoto(index)}
-                className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-center text-sm text-white"
-                aria-label={`Retirer ${photo.name}`}
-              >
-                ×
-              </button>
-            </div>
-          ))}
         </div>
       )}
     </div>
