@@ -1,12 +1,14 @@
 // https://blocks.so/file-upload
 
-import { Upload } from 'lucide-react';
+import { Camera, Upload } from 'lucide-react';
 import type React from 'react';
 import type { RefObject } from 'react';
 
 interface FileDropzoneProps {
   fileInputRef: RefObject<HTMLInputElement | null>;
+  cameraInputRef: RefObject<HTMLInputElement | null>;
   handleBoxClick: () => void;
+  handleCameraClick: () => void;
   handleDragOver: (e: React.DragEvent) => void;
   handleDrop: (e: React.DragEvent) => void;
   handleFileSelect: (files: FileList | null) => void;
@@ -14,7 +16,9 @@ interface FileDropzoneProps {
 
 export function FileDropzone({
   fileInputRef,
+  cameraInputRef,
   handleBoxClick,
+  handleCameraClick,
   handleDragOver,
   handleDrop,
   handleFileSelect,
@@ -31,18 +35,23 @@ export function FileDropzone({
           <Upload className="h-5 w-5 text-muted-foreground" />
         </div>
         <p className="font-medium text-foreground text-sm">
-          Ajoute tes photos
+          Ajouter depuis la galerie
         </p>
         <p className="mt-1 text-muted-foreground text-sm">
-          ou,{' '}
-          <label
-            className="cursor-pointer font-medium text-primary hover:text-primary/90"
-            htmlFor="fileUpload"
-            onClick={(e) => e.stopPropagation()} // Prevent triggering handleBoxClick
-          >
-            Clique pour chercher
-          </label>{' '}
+          ou
         </p>
+        <button
+          type="button"
+          className="mt-3 flex items-center gap-2 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
+          onClick={(e) => {
+            e.stopPropagation() // Prevent triggering handleBoxClick
+            handleCameraClick()
+          }}
+        >
+          <Camera className="h-4 w-4" />
+          Prendre une photo
+        </button>
+
         <input
           accept="image/*"
           className="hidden"
@@ -50,6 +59,15 @@ export function FileDropzone({
           multiple
           onChange={(e) => handleFileSelect(e.target.files)}
           ref={fileInputRef}
+          type="file"
+        />
+        <input
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          id="cameraCapture"
+          onChange={(e) => handleFileSelect(e.target.files)}
+          ref={cameraInputRef}
           type="file"
         />
       </div>
