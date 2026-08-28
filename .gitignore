@@ -32,3 +32,5 @@ coverage
 
 # Outils / cache
 .eslintcache
+
+supabase/.temp

@@ -1,24 +1,35 @@
 import { useEffect, useMemo, useState } from "react"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
 import { Badge } from "@/components/ui/badge"
 import { isSupabaseConfigured, supabase, SUPABASE_CONFIG_HELP } from "@/lib/supabase"
-import type { Guest, GuestStatus } from "@/types"
+import type { IGuest, GuestStatus, ISupabaseGuest } from "@/types"
 
-function isGuestStatus(value: string): value is GuestStatus {
-  return value === "confirmed" || value === "pending" || value === "declined"
+const mapRsvpToDomain = (rsvp: string): GuestStatus => {
+  switch (rsvp) {
+    case "A CONFIRMÉ":
+      return "confirmed"
+    case "ABSENT":
+      return "declined"
+    default:
+      return "pending"
+  }
 }
 
-function normalizeGuest(row: {
-  id: string
-  name: string
-  status: string
-  created_at: string
-}): Guest {
+const mapSupabaseTypeToDomain = (supabaseGuest: ISupabaseGuest): IGuest => {
   return {
-    id: row.id,
-    name: row.name,
-    status: isGuestStatus(row.status) ? row.status : "pending",
-    created_at: row.created_at,
+    id: supabaseGuest.notion_id,
+    name: supabaseGuest.nom,
+    status: mapRsvpToDomain(supabaseGuest.rsvp),
+    created_at: supabaseGuest.updated_at,
+    group: supabaseGuest.groupe,
   }
 }
 
@@ -30,9 +41,25 @@ function initialsFromName(name: string): string {
 }
 
 export default function Guests() {
-  const [guests, setGuests] = useState<Guest[]>([])
+  const [guests, setGuests] = useState<IGuest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filteredGuests, setFilteredGuests] = useState<IGuest[]>([])
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+
+  const groupOptions = useMemo(() => {
+    const unique = Array.from(new Set(guests.map((g) => g.group))).sort()
+    return unique.map((group) => ({ label: group, value: group }))
+  }, [guests])
+
+  useEffect(() => {
+    if (!selectedGroup) {
+      setFilteredGuests(guests)
+    } else {
+      console.log("selectedGroup", selectedGroup)
+      setFilteredGuests(guests.filter((g) => g.group === selectedGroup))
+    }
+  }, [guests, selectedGroup])
 
   useEffect(() => {
     let cancelled = false
@@ -47,8 +74,8 @@ export default function Guests() {
       }
       const { data, error: fetchError } = await supabase
         .from("guests")
-        .select("id,name,status,created_at")
-        .order("name")
+        .select("notion_id,nom,age,rsvp,hebergement,groupe,updated_at")
+        .order("nom")
 
       if (cancelled) return
 
@@ -56,7 +83,7 @@ export default function Guests() {
         setError(fetchError.message)
         setGuests([])
       } else {
-        setGuests((data ?? []).map((row) => normalizeGuest(row as Guest)))
+        setGuests((data ?? []).map((row) => mapSupabaseTypeToDomain(row as ISupabaseGuest)))
       }
       setLoading(false)
     }
@@ -119,12 +146,30 @@ export default function Guests() {
         <span>En attente · {counts.pending}</span>
         <span>Absents · {counts.declined}</span>
       </div>
+      <Select
+  value={selectedGroup ?? "all"}
+  onValueChange={(value: string | null) =>
+    setSelectedGroup(value === "all" || value === null ? null : value)
+  }
+>
+  <SelectTrigger>
+    <SelectValue placeholder="Tous les groupes" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all">Tous les groupes</SelectItem>
+    {groupOptions.map((group) => (
+      <SelectItem key={group.value} value={group.value}>
+        {group.label}
+      </SelectItem>
+    ))}
+  </SelectContent>
+</Select>
 
-      {guests.length === 0 ? (
+      {filteredGuests.length === 0 ? (
         <p className="text-center text-sm text-gray-500">Aucun invité pour le moment.</p>
       ) : (
         <ul className="space-y-3">
-          {guests.map((g) => (
+          {filteredGuests.map((g) => (
             <li key={g.id} className="card-glass flex items-center gap-3 rounded-2xl px-4 py-3">
               <div
                 style={{ background: "linear-gradient(135deg, #FA009D, #FA8100)" }}

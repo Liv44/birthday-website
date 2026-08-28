@@ -1,10 +1,20 @@
 export type GuestStatus = "confirmed" | "pending" | "declined"
 
-export interface Guest {
+export interface IGuest {
   id: string
   name: string
   status: GuestStatus
   created_at: string
+  group: string 
+}
+export interface ISupabaseGuest {
+  notion_id: string
+  nom: string
+  age: string
+  rsvp: string
+  hebergement: string
+  groupe: string
+  updated_at: string
 }
 
 export interface Rsvp {
