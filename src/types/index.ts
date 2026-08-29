@@ -1,11 +1,13 @@
-export type GuestStatus = "confirmed" | "pending" | "declined"
+export type GuestStatus = "confirmed" | "afternoon" | "pending" | "declined"
 
 export interface IGuest {
   id: string
   name: string
   status: GuestStatus
   created_at: string
-  group: string 
+  group: string
+  isChild: boolean
+  isPresent: boolean
 }
 export interface ISupabaseGuest {
   notion_id: string
