@@ -34,8 +34,8 @@ export default function Hero() {
           <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-brand-magenta">
             Date
           </p>
-          <p className="font-display text-xl font-bold text-gray-800">Samedi 12 juillet</p>
-          <p className="text-sm text-gray-500">À partir de 18h</p>
+          <p className="font-display text-xl font-bold text-gray-800">Samedi 29 août 2026</p>
+          <p className="text-sm text-gray-500">À partir de 15h</p>
         </div>
         <div className="text-center min-w-44 sm:text-left">
           <div className="text-3xl" aria-hidden>
@@ -44,8 +44,8 @@ export default function Hero() {
           <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-brand-magenta">
             Lieu
           </p>
-          <p className="font-display text-xl font-bold text-gray-800">Le Jardin des Lys</p>
-          <p className="text-sm text-gray-500">Paris &amp; alentours</p>
+          <p className="font-display text-xl font-bold text-gray-800">Ter'anima - La Dube</p>
+          <p className="text-sm text-gray-500">49120 Sainte Christine</p>
         </div>
         <div className="text-center min-w-44 sm:text-left">
           <div className="text-3xl" aria-hidden>
@@ -54,8 +54,7 @@ export default function Hero() {
           <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-brand-magenta">
             Thème
           </p>
-          <p className="font-display text-xl font-bold text-gray-800">Fleurs &amp; Disco</p>
-          <p className="text-sm text-gray-500">Paillettes bienvenues</p>
+          <p className="font-display text-xl font-bold text-gray-800">Couleurs, Fleurs &amp; Boules à facettes</p>
         </div>
       </div>
     </div>
